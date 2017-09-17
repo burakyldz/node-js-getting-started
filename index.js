@@ -46,7 +46,25 @@ app.get('/db', function (request, response) {
   });
 });
 
+const request = require('request');
 
+app.get('/sendPushNotification', function(request, response){
+
+  request({
+    url: `https://us-central1-fir-cloudmessagingexamples.cloudfunctions.net/sendPushNotification?text=Burak`,
+    json: true
+  }, (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      callback(undefined, {
+        temperature: body.currently.temperature,
+        apparentTemperature: body.currently.apparentTemperature
+      });
+    }else {
+      callback('Unable to fetch weather.');
+    }
+  });
+
+});
 
 
 

@@ -1,6 +1,7 @@
 var cool = require('cool-ascii-faces');
 var express = require('express');
 var pg = require('pg');
+const request = require('request');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -31,7 +32,6 @@ app.get('/times', function(request, response) {
 response.send(result);
 });
 
-
 app.get('/db', function (request, response) {
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
     client.query('SELECT * FROM test_table', function(err, result) {
@@ -46,22 +46,22 @@ app.get('/db', function (request, response) {
   });
 });
 
-const request = require('request');
+app.get('/sendPushNotification', function (req, resp) {
 
-app.get('/sendPushNotification', function(request, response){
+  var original = req.query.text;
 
-  request({
-    url: `https://us-central1-fir-cloudmessagingexamples.cloudfunctions.net/sendPushNotification?text=Burak`,
-    json: true
-  }, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      callback(undefined, {
-        temperature: body.currently.temperature,
-        apparentTemperature: body.currently.apparentTemperature
-      });
-    }else {
-      callback('Unable to fetch weather.');
-    }
+  console.log(original);
+
+  request(`https://us-central1-fir-cloudmessagingexamples.cloudfunctions.net/sendPushNotification?text=${original}`,
+   { json: true },
+    (err, res, body) => {
+    if (err) {
+        return resp.send("Error " + err);
+       } else {
+        return resp.send("Success");
+       }
+    console.log(body.url);
+    console.log(body.explanation);
   });
 
 });
